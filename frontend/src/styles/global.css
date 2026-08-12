@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #2563EB;
+  --secondary-color: #475569;
+  --success-color: #16A34A;
+  --warning-color: #F59E0B;
+  --danger-color: #DC2626;
+  --bg-color: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --border-color: #E2E8F0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--secondary-color);
+}
+
+.card-custom {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  border-radius: 12px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+}
+
+.btn-primary-custom:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.sidebar-link {
+  color: var(--secondary-color);
+  border-radius: 12px;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sidebar-link:hover, .sidebar-link.active {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--primary-color);
+}
+
+/* small adjustments for main layout spacing */
+main.p-4 { min-height: calc(100vh - 72px); }
