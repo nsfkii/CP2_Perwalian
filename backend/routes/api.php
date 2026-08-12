@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\DosenController;
 use App\Http\Controllers\Api\DosenWaliController;
 use App\Http\Controllers\Api\MahasiswaController;
 use App\Http\Controllers\Api\PerwalianController;
+use App\Http\Controllers\Api\RekapController;
+use App\Http\Controllers\Api\ImportController;
 
 // Endpoint publik (tidak perlu token)
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -28,6 +30,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Hanya Admin yang bisa mengelola data Mahasiswa, Dosen, dan Dosen Wali
     Route::middleware('role:admin')->group(function () {
+        // Rekap & export perwalian
+        Route::get('/rekap/perwalian', [RekapController::class, 'getRekap']);
+        Route::get('/rekap/perwalian/export/excel', [RekapController::class, 'exportExcel']);
+        Route::get('/rekap/perwalian/export/pdf', [RekapController::class, 'exportPdf']);
+        // Import endpoints
+        Route::post('/mahasiswa/import', [ImportController::class, 'importMahasiswa']);
+        Route::post('/dosen/import', [ImportController::class, 'importDosen']);
+
         Route::apiResource('mahasiswa', MahasiswaController::class);
         Route::apiResource('dosen', DosenController::class);
         Route::apiResource('dosen-wali', DosenWaliController::class);

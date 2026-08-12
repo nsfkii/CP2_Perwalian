@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DosenWaliRequest extends FormRequest
 {
@@ -13,10 +14,22 @@ class DosenWaliRequest extends FormRequest
 
     public function rules(): array
     {
-        $dosenWaliId = $this->route('dosen_wali') ? $this->route('dosen_wali')->id : null;
+        $dosenWali = $this->route('dosen_wali');
+
+        $mahasiswaRule = [
+            'required',
+            'integer',
+            'exists:mahasiswa,id',
+        ];
+
+        if ($dosenWali && $dosenWali->id) {
+            $mahasiswaRule[] = Rule::unique('dosen_wali', 'mahasiswa_id')->ignore($dosenWali->id);
+        } else {
+            $mahasiswaRule[] = Rule::unique('dosen_wali', 'mahasiswa_id');
+        }
 
         return [
-            'mahasiswa_id' => 'required|integer|exists:mahasiswa,id|unique:dosen_wali,mahasiswa_id,' . $dosenWaliId,
+            'mahasiswa_id' => $mahasiswaRule,
             'dosen_id' => 'required|integer|exists:dosen,id',
         ];
     }

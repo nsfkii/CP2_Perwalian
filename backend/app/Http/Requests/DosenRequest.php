@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DosenRequest extends FormRequest
 {
@@ -13,12 +14,32 @@ class DosenRequest extends FormRequest
 
     public function rules(): array
     {
-        $dosenId = $this->route('dosen') ? $this->route('dosen')->id : null;
+        $dosen = $this->route('dosen');
+
+        $nidnRule = [
+            'required',
+            'string',
+            'max:20',
+            'regex:/^[0-9]+$/',
+        ];
+
+        if ($dosen && $dosen->id) {
+            $nidnRule[] = Rule::unique('dosen', 'nidn')->ignore($dosen->id);
+        } else {
+            $nidnRule[] = Rule::unique('dosen', 'nidn');
+        }
+
+        $emailRule = ['nullable', 'email', 'max:255'];
+        if ($dosen && $dosen->id) {
+            $emailRule[] = Rule::unique('dosen', 'email')->ignore($dosen->id);
+        } else {
+            $emailRule[] = Rule::unique('dosen', 'email');
+        }
 
         return [
-            'nidn' => 'required|string|max:20|unique:dosen,nidn,' . $dosenId,
+            'nidn' => $nidnRule,
             'nama' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:dosen,email,' . $dosenId,
+            'email' => $emailRule,
             'no_hp' => 'nullable|string|max:20',
         ];
     }

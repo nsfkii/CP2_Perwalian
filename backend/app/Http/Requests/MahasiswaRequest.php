@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MahasiswaRequest extends FormRequest
 {
@@ -13,10 +14,22 @@ class MahasiswaRequest extends FormRequest
 
     public function rules(): array
     {
-        $mahasiswaId = $this->route('mahasiswa') ? $this->route('mahasiswa')->id : null;
+        $mahasiswa = $this->route('mahasiswa');
+
+        $nimRule = [
+            'required',
+            'string',
+            'max:20',
+        ];
+
+        if ($mahasiswa && $mahasiswa->id) {
+            $nimRule[] = Rule::unique('mahasiswa', 'nim')->ignore($mahasiswa->id);
+        } else {
+            $nimRule[] = Rule::unique('mahasiswa', 'nim');
+        }
 
         return [
-            'nim' => 'required|string|max:20|unique:mahasiswa,nim,' . $mahasiswaId,
+            'nim' => $nimRule,
             'nama' => 'required|string|max:255',
             'prodi' => 'required|string|max:100',
             'angkatan' => 'required|string|max:4',
