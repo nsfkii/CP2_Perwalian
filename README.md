@@ -47,11 +47,11 @@ Buka terminal dan masuk ke dalam folder backend:
 ```bash
 cd backend
 Instal dependensi PHP:
-
 Bash
 composer install
-Salin file konfigurasi environment:
 
+
+Salin file konfigurasi environment:
 Bash
 cp .env.example .env
 Buka file .env yang baru dibuat dan sesuaikan konfigurasi database Anda:
@@ -86,8 +86,8 @@ Instal dependensi Node:
 
 Bash
 npm install
-Jalankan server development:
 
+Jalankan server development:
 Bash
 npm run dev
 (Frontend akan berjalan di http://localhost:5173)
