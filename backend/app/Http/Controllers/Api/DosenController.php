@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DosenRequest;
 use App\Http\Resources\DosenResource;
+use App\Http\Resources\PerwalianResource;
 use App\Models\Dosen;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,13 +20,16 @@ class DosenController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($query) use ($search) {
                 $query->where('nama', 'ilike', "%{$search}%")
                       ->orWhere('nidn', 'ilike', "%{$search}%");
             });
         }
 
-        $dosen = $query->orderBy('created_at', 'desc')->paginate(10);
+        $dosen = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return DosenResource::collection($dosen)->additional([
             'success' => true,
@@ -58,8 +62,11 @@ class DosenController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Data dosen berhasil ditambahkan.',
-                'data' => new DosenResource($dosen->load('user')),
+                'data' => new DosenResource(
+                    $dosen->load('user')
+                ),
             ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -75,7 +82,9 @@ class DosenController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Detail dosen berhasil diambil.',
-            'data' => new DosenResource($dosen->load('user')),
+            'data' => new DosenResource(
+                $dosen->load('user')
+            ),
         ], 200);
     }
 
@@ -84,7 +93,14 @@ class DosenController extends Controller
         DB::beginTransaction();
 
         try {
-            $dosen->update($request->only(['nidn', 'nama', 'email', 'no_hp']));
+            $dosen->update(
+                $request->only([
+                    'nidn',
+                    'nama',
+                    'email',
+                    'no_hp'
+                ])
+            );
 
             if ($dosen->user) {
                 $dosen->user->update([
@@ -97,8 +113,11 @@ class DosenController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Data dosen berhasil diperbarui.',
-                'data' => new DosenResource($dosen->load('user')),
+                'data' => new DosenResource(
+                    $dosen->load('user')
+                ),
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -109,8 +128,9 @@ class DosenController extends Controller
         }
     }
 
-    // Menampilkan mahasiswa yang menjadi mahasiswa wali
-    // dari dosen yang sedang login
+    // =========================================================
+    // MENAMPILKAN MAHASISWA WALI DOSEN YANG SEDANG LOGIN
+    // =========================================================
     public function mahasiswaWali(Request $request)
     {
         $user = $request->user();
@@ -140,6 +160,58 @@ class DosenController extends Controller
         ], 200);
     }
 
+    // =========================================================
+    // HISTORI PERWALIAN MAHASISWA WALI TERTENTU
+    // =========================================================
+    public function historiMahasiswaWali(
+        Request $request,
+        $mahasiswaId
+    ) {
+        $user = $request->user();
+
+        // Cari dosen yang sedang login
+        $dosen = Dosen::where('user_id', $user->id)->first();
+
+        if (!$dosen) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data dosen tidak ditemukan.',
+            ], 404);
+        }
+
+        // Pastikan mahasiswa tersebut memang mahasiswa wali
+        // dari dosen yang sedang login
+        $mahasiswaWali = $dosen->dosenWali()
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->with('mahasiswa')
+            ->first();
+
+        if (!$mahasiswaWali) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mahasiswa tersebut bukan mahasiswa wali Anda.',
+            ], 403);
+        }
+
+        // Ambil histori perwalian mahasiswa
+        $perwalian = $mahasiswaWali->mahasiswa
+            ->perwalian()
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Histori perwalian mahasiswa berhasil diambil.',
+            'data' => [
+                'mahasiswa' => $mahasiswaWali->mahasiswa,
+                'perwalian' => PerwalianResource::collection($perwalian),
+            ],
+        ], 200);
+    }
+
+    // =========================================================
+    // HAPUS DOSEN
+    // =========================================================
     public function destroy(Dosen $dosen)
     {
         DB::beginTransaction();
@@ -171,6 +243,7 @@ class DosenController extends Controller
                 'success' => true,
                 'message' => 'Data dosen berhasil dihapus.',
             ], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
 

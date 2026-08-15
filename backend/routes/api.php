@@ -15,9 +15,13 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Endpoint terproteksi (wajib pakai token Bearer)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
-    // Endpoint untuk mendapatkan data profil user yang sedang login
+
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+
+    // =========================================================
+    // USER YANG SEDANG LOGIN
+    // =========================================================
     Route::get('/user', function (Request $request) {
         return response()->json([
             'success' => true,
@@ -25,28 +29,110 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
-    // Profil mahasiswa yang sedang login
-    Route::get('/mahasiswa/profil', [MahasiswaController::class, 'profil']);
+    // =========================================================
+    // PROFIL MAHASISWA YANG SEDANG LOGIN
+    // =========================================================
+    Route::get(
+        '/mahasiswa/profil',
+        [MahasiswaController::class, 'profil']
+    );
 
-    // Mahasiswa wali dari dosen yang sedang login
-    Route::get('/dosen/mahasiswa-wali', [DosenController::class, 'mahasiswaWali']);
+    // =========================================================
+    // DOSEN - MAHASISWA WALI
+    // =========================================================
 
-    // Endpoint Perwalian dapat diakses oleh mahasiswa, dosen, dan admin
-    Route::apiResource('perwalian', PerwalianController::class);
+    // Menampilkan daftar mahasiswa wali dari dosen yang sedang login
+    Route::get(
+        '/dosen/mahasiswa-wali',
+        [DosenController::class, 'mahasiswaWali']
+    );
 
-    // Hanya Admin yang bisa mengelola data Mahasiswa, Dosen, dan Dosen Wali
+    // Menampilkan histori perwalian mahasiswa wali tertentu
+    Route::get(
+        '/dosen/mahasiswa-wali/{mahasiswaId}/perwalian',
+        [DosenController::class, 'historiMahasiswaWali']
+    );
+
+    // =========================================================
+    // PERWALIAN
+    // =========================================================
+    // Dapat diakses oleh mahasiswa, dosen, dan admin
+    Route::apiResource(
+        'perwalian',
+        PerwalianController::class
+    );
+
+    // =========================================================
+    // KHUSUS ADMIN
+    // =========================================================
     Route::middleware('role:admin')->group(function () {
-        // Rekap & export perwalian
-        Route::get('/rekap/perwalian', [RekapController::class, 'getRekap']);
-        Route::get('/rekap/perwalian/export/excel', [RekapController::class, 'exportExcel']);
-        Route::get('/rekap/perwalian/export/pdf', [RekapController::class, 'exportPdf']);
 
-        // Import endpoints
-        Route::post('/mahasiswa/import', [ImportController::class, 'importMahasiswa']);
-        Route::post('/dosen/import', [ImportController::class, 'importDosen']);
+        // -----------------------------------------------------
+        // REKAP & EXPORT PERWALIAN
+        // -----------------------------------------------------
+        Route::get(
+            '/rekap/perwalian',
+            [RekapController::class, 'getRekap']
+        );
 
-        Route::apiResource('mahasiswa', MahasiswaController::class);
-        Route::apiResource('dosen', DosenController::class);
-        Route::apiResource('dosen-wali', DosenWaliController::class);
+        Route::get(
+            '/rekap/perwalian/export/excel',
+            [RekapController::class, 'exportExcel']
+        );
+
+        Route::get(
+            '/rekap/perwalian/export/pdf',
+            [RekapController::class, 'exportPdf']
+        );
+
+        // -----------------------------------------------------
+        // IMPORT
+        // -----------------------------------------------------
+        Route::post(
+            '/mahasiswa/import',
+            [ImportController::class, 'importMahasiswa']
+        );
+
+        Route::post(
+            '/dosen/import',
+            [ImportController::class, 'importDosen']
+        );
+
+        // -----------------------------------------------------
+        // MAHASISWA
+        // -----------------------------------------------------
+        Route::apiResource(
+            'mahasiswa',
+            MahasiswaController::class
+        );
+
+        // -----------------------------------------------------
+        // DOSEN
+        // -----------------------------------------------------
+        Route::apiResource(
+            'dosen',
+            DosenController::class
+        );
+
+        // -----------------------------------------------------
+        // PLOTTING BANYAK MAHASISWA
+        // -----------------------------------------------------
+        Route::get(
+            '/dosen-wali/mahasiswa-belum-wali',
+            [DosenWaliController::class, 'mahasiswaBelumPunyaWali']
+        );
+
+        Route::post(
+            '/dosen-wali/store-many',
+            [DosenWaliController::class, 'storeMany']
+        );
+
+        // -----------------------------------------------------
+        // DOSEN WALI
+        // -----------------------------------------------------
+        Route::apiResource(
+            'dosen-wali',
+            DosenWaliController::class
+        );
     });
 });
