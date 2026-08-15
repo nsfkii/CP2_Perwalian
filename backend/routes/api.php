@@ -25,6 +25,12 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+    // Profil mahasiswa yang sedang login
+    Route::get('/mahasiswa/profil', [MahasiswaController::class, 'profil']);
+
+    // Mahasiswa wali dari dosen yang sedang login
+    Route::get('/dosen/mahasiswa-wali', [DosenController::class, 'mahasiswaWali']);
+
     // Endpoint Perwalian dapat diakses oleh mahasiswa, dosen, dan admin
     Route::apiResource('perwalian', PerwalianController::class);
 
@@ -34,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rekap/perwalian', [RekapController::class, 'getRekap']);
         Route::get('/rekap/perwalian/export/excel', [RekapController::class, 'exportExcel']);
         Route::get('/rekap/perwalian/export/pdf', [RekapController::class, 'exportPdf']);
+
         // Import endpoints
         Route::post('/mahasiswa/import', [ImportController::class, 'importMahasiswa']);
         Route::post('/dosen/import', [ImportController::class, 'importDosen']);

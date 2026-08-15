@@ -109,6 +109,37 @@ class DosenController extends Controller
         }
     }
 
+    // Menampilkan mahasiswa yang menjadi mahasiswa wali
+    // dari dosen yang sedang login
+    public function mahasiswaWali(Request $request)
+    {
+        $user = $request->user();
+
+        $dosen = Dosen::with('dosenWali.mahasiswa')
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$dosen) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data dosen tidak ditemukan.',
+            ], 404);
+        }
+
+        $mahasiswa = $dosen->dosenWali
+            ->map(function ($dosenWali) {
+                return $dosenWali->mahasiswa;
+            })
+            ->filter()
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar mahasiswa wali berhasil diambil.',
+            'data' => $mahasiswa,
+        ], 200);
+    }
+
     public function destroy(Dosen $dosen)
     {
         DB::beginTransaction();
