@@ -42,8 +42,21 @@ export default function DosenDashboard() {
                             <p className="text-muted small mb-3">
                                 Seluruh catatan konsultasi akademik dari mahasiswa yang berada di bawah bimbingan Anda akan terekam secara otomatis di dalam sistem.
                             </p>
-                            <Link to="/dosen/perwalian" className="btn btn-primary-custom text-white d-inline-flex align-items-center">
+
+                            <Link
+                                to="/dosen/perwalian"
+                                className="btn btn-primary-custom text-white d-inline-flex align-items-center"
+                            >
                                 Lihat Histori Mahasiswa <FiArrowRight className="ms-2" />
+                            </Link>
+
+                            <br />
+
+                            <Link
+                                to="/dosen/mahasiswa-wali"
+                                className="btn btn-outline-primary mt-2 d-inline-flex align-items-center"
+                            >
+                                Mahasiswa Wali <FiArrowRight className="ms-2" />
                             </Link>
                         </div>
                     </div>

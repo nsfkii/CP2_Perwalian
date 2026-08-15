@@ -16,6 +16,7 @@ import ImportMahasiswa from '../pages/admin/ImportMahasiswa';
 import ImportDosen from '../pages/admin/ImportDosen';
 import MahasiswaPerwalian from '../pages/mahasiswa/Perwalian';
 import DosenPerwalian from '../pages/dosen/Perwalian';
+import MahasiswaWali from '../pages/dosen/MahasiswaWali';
 
 export default function AppRoutes() {
   return (
@@ -43,6 +44,7 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute allowedRoles={["dosen"]} />}>
           <Route path="/dosen/dashboard" element={<DosenDashboard />} />
           <Route path="/dosen/perwalian" element={<DosenPerwalian />} />
+          <Route path="/dosen/mahasiswa-wali" element={<MahasiswaWali />} />
         </Route>
       </Route>
 
