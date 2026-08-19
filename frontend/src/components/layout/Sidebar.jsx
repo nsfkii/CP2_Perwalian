@@ -70,6 +70,11 @@ export default function Sidebar() {
                             </NavLink>
                         </li>
                         <li className="nav-item">
+                            <NavLink to="/dosen/mahasiswa-wali" className="nav-link sidebar-link d-flex align-items-center">
+                                <FiUsers className="me-3 fs-5" /> Mahasiswa Wali
+                            </NavLink>
+                        </li>
+                        <li className="nav-item">
                             <NavLink to="/dosen/perwalian" className="nav-link sidebar-link d-flex align-items-center">
                                 <FiFileText className="me-3 fs-5" /> Histori Perwalian
                             </NavLink>

@@ -1,7 +1,16 @@
 import api from './axios';
 
-export const getPerwalians = async (page = 1, search = '') => {
-    const response = await api.get(`/perwalian?page=${page}&search=${encodeURIComponent(search)}`);
+export const getPerwalians = async (page = 1, search = '', dosenId = '') => {
+    const params = new URLSearchParams({
+        page: String(page),
+        search,
+    });
+
+    if (dosenId) {
+        params.set('dosen_id', String(dosenId));
+    }
+
+    const response = await api.get(`/perwalian?${params.toString()}`);
     return response.data;
 };
 

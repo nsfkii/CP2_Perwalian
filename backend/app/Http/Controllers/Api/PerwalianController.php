@@ -27,6 +27,10 @@ class PerwalianController extends Controller
             $query->where('dosen_id', $dosen->id ?? 0);
         }
 
+        if ($user->role === 'admin' && $request->filled('dosen_id')) {
+            $query->where('dosen_id', $request->dosen_id);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where('topik', 'ilike', "%{$search}%");

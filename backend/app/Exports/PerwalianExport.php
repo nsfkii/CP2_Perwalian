@@ -11,7 +11,16 @@ class PerwalianExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return Perwalian::with(['mahasiswa', 'dosen'])->orderBy('tanggal', 'desc')->get();
+        $query = Perwalian::with(['mahasiswa', 'dosen'])->orderBy('tanggal', 'desc');
+
+        if ($this->dosenId) {
+            $query->where('dosen_id', $this->dosenId);
+        }
+
+        return $query->get();
+    }
+    public function __construct(private readonly ?int $dosenId = null)
+    {
     }
 
     public function headings(): array

@@ -15,6 +15,10 @@ class RekapController extends Controller
     {
         $query = Perwalian::with(['mahasiswa', 'dosen'])->orderBy('tanggal', 'desc');
 
+        if ($request->user()->role === 'admin' && $request->filled('dosen_id')) {
+            $query->where('dosen_id', $request->dosen_id);
+        }
+
         // optional filters (page, search, tanggal range) can be added here
         $perwalians = $query->paginate(15);
 
@@ -40,14 +44,38 @@ class RekapController extends Controller
         ]);
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        return Excel::download(new PerwalianExport, 'rekap_perwalian_stmik.xlsx');
+        $user = $request->user();
+        $dosenId = $request->query('dosen_id');
+
+        if ($user->role === 'dosen') {
+            $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
+            $dosenId = $dosen->id ?? 0;
+        }
+
+        return Excel::download(
+            new PerwalianExport($dosenId ? (int) $dosenId : null),
+            'rekap_perwalian_stmik.xlsx'
+        );
     }
 
-    public function exportPdf()
+    public function exportPdf(Request $request)
     {
-        $perwalians = Perwalian::with(['mahasiswa', 'dosen'])->orderBy('tanggal', 'desc')->get();
+        $user = $request->user();
+        $dosenId = $request->query('dosen_id');
+        $query = Perwalian::with(['mahasiswa', 'dosen'])->orderBy('tanggal', 'desc');
+
+        if ($user->role === 'dosen') {
+            $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
+            $dosenId = $dosen->id ?? 0;
+        }
+
+        if ($dosenId) {
+            $query->where('dosen_id', $dosenId);
+        }
+
+        $perwalians = $query->get();
 
         $pdf = Pdf::loadView('rekap_pdf', compact('perwalians'));
         $pdf->setPaper('A4', 'landscape');

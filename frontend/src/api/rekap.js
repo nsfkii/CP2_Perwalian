@@ -1,14 +1,16 @@
 import api from './axios';
 
 export const getRekapData = async (filters = {}) => {
-  const params = new URLSearchParams(filters).toString();
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== '')),
+  ).toString();
   const response = await api.get(`/rekap/perwalian${params ? `?${params}` : ''}`);
   return response; // return full axios response so callers can access response.data.summary
 };
 
-export const exportData = async (format) => {
-  // format: 'excel' or 'pdf'
-  const response = await api.get(`/rekap/perwalian/export/${format}`, {
+export const exportData = async (format, dosenId = '') => {
+  const params = dosenId ? `?dosen_id=${encodeURIComponent(dosenId)}` : '';
+  const response = await api.get(`/rekap/perwalian/export/${format}${params}`, {
     responseType: 'blob',
   });
 
