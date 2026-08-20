@@ -98,7 +98,7 @@ export default function AdminDashboard() {
                 <div className="row">
                     <div className="col-12">
                         <div className="card-custom p-4 bg-light">
-                            <h6 className="fw-bold text-secondary mb-3">Jalan Pintas Administrasi</h6>
+                            <h6 className="fw-bold text-secondary mb-3">Menu Administrasi</h6>
                             <div className="d-flex gap-3">
                                 <Link to="/admin/mahasiswa" className="btn btn-outline-primary bg-white">Kelola Mahasiswa</Link>
                                 <Link to="/admin/dosen" className="btn btn-outline-success bg-white">Kelola Dosen</Link>

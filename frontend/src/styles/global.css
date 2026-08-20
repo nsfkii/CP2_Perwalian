@@ -38,6 +38,57 @@ body {
   border-color: #1d4ed8;
 }
 
+.login-submit-btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-submit-btn.is-loading {
+  cursor: wait;
+  opacity: 0.9;
+}
+
+.login-submit-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 0.18em;
+}
+
+.btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.app-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 250, 252, 0.78);
+  backdrop-filter: blur(3px);
+}
+
+.app-loading-box {
+  width: 86px;
+  height: 86px;
+  padding: 1.25rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .sidebar-link {
   color: var(--secondary-color);
   border-radius: 12px;
@@ -51,5 +102,84 @@ body {
   color: var(--primary-color);
 }
 
+.sidebar-brand-logo {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  object-fit: contain;
+}
+
 /* small adjustments for main layout spacing */
 main.p-4 { min-height: calc(100vh - 72px); }
+
+.sidebar-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-collapsed {
+  width: 80px !important;
+}
+
+.sidebar-collapsed .sidebar-text,
+.sidebar-collapsed .sidebar-header-text,
+.sidebar-collapsed .sidebar-section-title {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-link {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sidebar-collapsed .sidebar-link svg {
+  margin-right: 0 !important;
+  font-size: 1.35rem !important;
+}
+
+.sidebar-collapsed .sidebar-footer {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.sidebar-collapsed .sidebar-footer > div {
+  justify-content: center !important;
+}
+
+.sidebar-collapsed .sidebar-profile {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-logout-btn {
+  margin-left: 0 !important;
+  width: 44px;
+  height: 44px;
+}
+
+.main-content {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+}
+
+.main-content.expanded {
+  margin-left: 80px;
+  width: calc(100% - 80px);
+}
+
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    transform: translateX(-100%);
+    width: 260px !important;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar-mobile.show {
+    transform: translateX(0);
+  }
+
+  .main-content,
+  .main-content.expanded {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}

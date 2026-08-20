@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Modal, Form, Table, InputGroup, FormControl } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -12,6 +12,7 @@ export default function Mahasiswa() {
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     
@@ -29,6 +30,7 @@ export default function Mahasiswa() {
             setData(res.data || []);
             setMeta(res.meta || null);
         } catch (error) {
+            console.error('Gagal mengambil data mahasiswa', error);
             toast.error('Gagal mengambil data mahasiswa');
         } finally {
             setLoading(false);
@@ -36,6 +38,8 @@ export default function Mahasiswa() {
     }, []);
 
     useEffect(() => {
+        // Data table memang perlu disinkronkan setiap page/search berubah.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchMahasiswas(currentPage, search);
     }, [currentPage, search, fetchMahasiswas]);
 
@@ -92,11 +96,14 @@ export default function Mahasiswa() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    setDeletingId(id);
                     const res = await deleteMahasiswa(id);
                     toast.success(res.message || 'Data berhasil dihapus');
                     fetchMahasiswas(currentPage, search);
                 } catch (error) {
                     toast.error(error.response?.data?.message || 'Gagal menghapus data');
+                } finally {
+                    setDeletingId(null);
                 }
             }
         });
@@ -128,8 +135,12 @@ export default function Mahasiswa() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
-                            <Button variant="outline-secondary" type="submit">
-                                <FiSearch />
+                            <Button variant="outline-secondary" type="submit" disabled={loading}>
+                                {loading ? (
+                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                ) : (
+                                    <FiSearch />
+                                )}
                             </Button>
                         </InputGroup>
                     </form>
@@ -170,8 +181,12 @@ export default function Mahasiswa() {
                                                 <Button variant="light" size="sm" className="text-primary me-2 shadow-sm" onClick={() => handleShowEdit(row)}>
                                                     <FiEdit2 />
                                                 </Button>
-                                                <Button variant="light" size="sm" className="text-danger shadow-sm" onClick={() => handleDelete(row.id)}>
-                                                    <FiTrash2 />
+                                                <Button variant="light" size="sm" className="text-danger shadow-sm" onClick={() => handleDelete(row.id)} disabled={deletingId === row.id}>
+                                                    {deletingId === row.id ? (
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                    ) : (
+                                                        <FiTrash2 />
+                                                    )}
                                                 </Button>
                                             </td>
                                         </tr>
@@ -190,7 +205,7 @@ export default function Mahasiswa() {
                                 <Button 
                                     variant="outline-secondary" 
                                     size="sm" 
-                                    disabled={currentPage === 1}
+                                    disabled={currentPage === 1 || loading}
                                     onClick={() => setCurrentPage(prev => prev - 1)}
                                 >
                                     Sebelumnya
@@ -198,7 +213,7 @@ export default function Mahasiswa() {
                                 <Button 
                                     variant="outline-secondary" 
                                     size="sm" 
-                                    disabled={currentPage === meta.last_page}
+                                    disabled={currentPage === meta.last_page || loading}
                                     onClick={() => setCurrentPage(prev => prev + 1)}
                                 >
                                     Selanjutnya
@@ -243,7 +258,6 @@ export default function Mahasiswa() {
                                 <option value="">-- Pilih Prodi --</option>
                                 <option value="Teknik Informatika">Teknik Informatika</option>
                                 <option value="Sistem Informasi">Sistem Informasi</option>
-                                <option value="Manajemen Informatika">Manajemen Informatika</option>
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">{errors.prodi?.message}</Form.Control.Feedback>
                         </Form.Group>
@@ -277,6 +291,9 @@ export default function Mahasiswa() {
                             Batal
                         </Button>
                         <Button variant="primary" className="btn-primary-custom" type="submit" disabled={isSubmitting}>
+                            {isSubmitting && (
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                            )}
                             {isSubmitting ? 'Menyimpan...' : 'Simpan Data'}
                         </Button>
                     </Modal.Footer>
